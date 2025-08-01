@@ -1,0 +1,355 @@
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتيجة الثانوية العامة بمصر لعام 2025</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'cairo': ['Cairo', 'sans-serif'],
+                        'amiri': ['Amiri', 'serif']
+                    },
+                    colors: {
+                        'egyptian-green': '#1B5E20',
+                        'egyptian-gold': '#FFD700',
+                        'egyptian-red': '#CE1126'
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-gray-50 font-cairo">
+    <div class="min-h-screen">
+        <!-- Top Ad Placeholder -->
+        <div class="bg-gray-200 border-2 border-dashed border-gray-400 p-4 text-center text-gray-600 mb-4">
+            <p class="text-sm"><!-- منطقة إعلانات علوية - Google AdSense --></p>
+            <p class="text-xs mt-1">728x90 أو 320x50 للموبايل</p>
+        </div>
+
+        <!-- Header -->
+        <header class="bg-gradient-to-r from-egyptian-green to-green-700 text-white shadow-lg">
+            <div class="max-w-4xl mx-auto px-4 py-6">
+                <div class="flex items-center justify-center mb-4">
+                    <div class="bg-white p-3 rounded-full ml-4">
+                        <div class="w-12 h-12 bg-egyptian-green rounded-full flex items-center justify-center">
+                            <span class="text-white font-bold text-xl">🎓</span>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <h1 class="text-2xl md:text-3xl font-bold font-amiri" id="main-title">
+                            نتيجة الثانوية العامة بمصر لعام <span id="current-year">2025</span>
+                        </h1>
+                        <p class="text-green-100 mt-2">وزارة التربية والتعليم - جمهورية مصر العربية</p>
+                    </div>
+                </div>
+                
+                <!-- Date Display -->
+                <div class="text-center bg-green-800 bg-opacity-50 rounded-lg p-3">
+                    <p class="text-lg font-semibold">
+                        نتيجة الثانوية العامة الجديدة بتاريخ: <span id="arabic-date" class="text-egyptian-gold"></span>
+                    </p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-2xl mx-auto px-4 py-8">
+            <!-- Search Form -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-8" id="search-form">
+                <h2 class="text-xl font-bold text-gray-800 mb-6 text-center border-b-2 border-egyptian-gold pb-2">
+                    استعلام عن النتيجة
+                </h2>
+                
+                <form id="result-form" class="space-y-4">
+                    <!-- Full Name Fields -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">الاسم الأول</label>
+                            <input type="text" id="first-name" name="firstName" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-egyptian-green focus:border-transparent text-right"
+                                placeholder="محمد">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">اسم الأب</label>
+                            <input type="text" id="father-name" name="fatherName" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-egyptian-green focus:border-transparent text-right"
+                                placeholder="أحمد">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">اسم الجد</label>
+                            <input type="text" id="grandfather-name" name="grandfatherName" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-egyptian-green focus:border-transparent text-right"
+                                placeholder="علي">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">اسم العائلة</label>
+                            <input type="text" id="family-name" name="familyName" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-egyptian-green focus:border-transparent text-right"
+                                placeholder="الشريف">
+                        </div>
+                    </div>
+                    
+                    <!-- Seat Number -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">رقم الجلوس</label>
+                        <input type="text" id="seat-number" name="seatNumber" required pattern="[0-9]+"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-egyptian-green focus:border-transparent text-center text-2xl font-bold"
+                            placeholder="123456">
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <button type="submit" id="submit-btn"
+                        class="w-full bg-egyptian-green hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg transition duration-300 transform hover:scale-105 shadow-lg">
+                        <span id="submit-text">استعلم عن النتيجة</span>
+                        <span id="loading-text" class="hidden">جاري البحث...</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Result Display -->
+            <div class="bg-white rounded-xl shadow-lg p-6 hidden" id="result-display">
+                <div class="text-center">
+                    <div class="mb-6">
+                        <div class="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-4">
+                            <span class="text-4xl">🏆</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">نتيجة الطالب</h3>
+                        <p class="text-gray-600" id="student-name-display"></p>
+                    </div>
+                    
+                    <!-- Score Display -->
+                    <div class="bg-gradient-to-r from-egyptian-green to-green-700 text-white rounded-xl p-6 mb-6">
+                        <p class="text-lg mb-2">درجتك هي:</p>
+                        <p class="text-4xl font-bold mb-2" id="score-display">--.--%</p>
+                        <div class="inline-block bg-white bg-opacity-20 rounded-full px-4 py-2">
+                            <span class="text-lg font-semibold" id="grade-display">--</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional Info -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-600">
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <p class="font-semibold">رقم الجلوس</p>
+                            <p id="seat-display">--</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-3">
+                            <p class="font-semibold">تاريخ الاستعلام</p>
+                            <p id="query-date">--</p>
+                        </div>
+                    </div>
+                    
+                    <!-- New Search Button -->
+                    <button onclick="resetForm()" 
+                        class="mt-6 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                        استعلام جديد
+                    </button>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div class="bg-red-50 border border-red-200 rounded-xl p-4 hidden" id="error-message">
+                <div class="flex items-center">
+                    <span class="text-red-500 text-xl ml-3">⚠️</span>
+                    <p class="text-red-700" id="error-text">حدث خطأ في النظام. يرجى المحاولة مرة أخرى.</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- Bottom Ad Placeholder -->
+        <div class="bg-gray-200 border-2 border-dashed border-gray-400 p-4 text-center text-gray-600 mt-8">
+            <p class="text-sm"><!-- منطقة إعلانات سفلية - Google AdSense --></p>
+            <p class="text-xs mt-1">728x90 أو 320x100 للموبايل</p>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 text-white py-6 mt-8">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+                <p class="text-sm text-gray-300">
+                    © <span id="footer-year">2025</span> وزارة التربية والتعليم - جمهورية مصر العربية
+                </p>
+                <p class="text-xs text-gray-400 mt-2">
+                    جميع الحقوق محفوظة - هذا الموقع للأغراض التعليمية فقط
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = 'https://your-project.supabase.co'; // Replace with actual URL
+        const supabaseKey = 'sbp_7c41e8dbc23169c2762b100643110a526562e74b';
+        // const supabase = supabase.createClient(supabaseUrl, supabaseKey); // TODO: Initialize Supabase client
+
+        // Update dynamic content
+        (function initializePage() {
+            const currentYear = new Date().getFullYear();
+            document.getElementById('current-year').textContent = currentYear;
+            document.getElementById('footer-year').textContent = currentYear;
+            
+            // Update title dynamically
+            document.title = `نتيجة الثانوية العامة بمصر لعام ${currentYear}`;
+            document.getElementById('main-title').innerHTML = 
+                `نتيجة الثانوية العامة بمصر لعام <span id="current-year">${currentYear}</span>`;
+            
+            // Set Arabic date
+            const today = new Date();
+            const arabicDate = today.toLocaleDateString('ar-EG', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long'
+            });
+            document.getElementById('arabic-date').textContent = arabicDate;
+        })();
+
+        // Form submission handler
+        document.getElementById('result-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const submitText = document.getElementById('submit-text');
+            const loadingText = document.getElementById('loading-text');
+            
+            // Show loading state
+            submitText.classList.add('hidden');
+            loadingText.classList.remove('hidden');
+            submitBtn.disabled = true;
+            
+            // Hide previous results/errors
+            document.getElementById('result-display').classList.add('hidden');
+            document.getElementById('error-message').classList.add('hidden');
+            
+            try {
+                // Get form data
+                const formData = new FormData(e.target);
+                const firstName = formData.get('firstName');
+                const fatherName = formData.get('fatherName');
+                const grandfatherName = formData.get('grandfatherName');
+                const familyName = formData.get('familyName');
+                const seatNumber = formData.get('seatNumber');
+                
+                const fullName = `${firstName} ${fatherName} ${grandfatherName} ${familyName}`;
+                
+                // Simulate API call delay
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // TODO: Check database for existing entry
+                // const { data: existingResult } = await supabase
+                //     .from('exam_results')
+                //     .select('*')
+                //     .or(`full_name.eq.${fullName},seat_number.eq.${seatNumber}`)
+                //     .single();
+                
+                let score;
+                let isNewResult = true;
+                
+                // Mock database check - simulate random existing results
+                if (Math.random() < 0.3) { // 30% chance of existing result
+                    score = (Math.random() * 45 + 50).toFixed(2); // Existing score
+                    isNewResult = false;
+                } else {
+                    score = (Math.random() * 45 + 50).toFixed(2); // New random score
+                    
+                    // TODO: Store new result in database
+                    // const { error } = await supabase
+                    //     .from('exam_results')
+                    //     .insert([{
+                    //         full_name: fullName,
+                    //         seat_number: seatNumber,
+                    //         score: parseFloat(score),
+                    //         created_at: new Date().toISOString()
+                    //     }]);
+                }
+                
+                // Display result
+                displayResult(fullName, seatNumber, score);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showError('حدث خطأ في النظام. يرجى المحاولة مرة أخرى.');
+            } finally {
+                // Reset button state
+                submitText.classList.remove('hidden');
+                loadingText.classList.add('hidden');
+                submitBtn.disabled = false;
+            }
+        });
+
+        function displayResult(fullName, seatNumber, score) {
+            const scoreNum = parseFloat(score);
+            let grade;
+            
+            if (scoreNum < 60) {
+                grade = 'مقبول';
+            } else if (scoreNum < 75) {
+                grade = 'جيد';
+            } else if (scoreNum < 85) {
+                grade = 'جيد جداً';
+            } else {
+                grade = 'ممتاز';
+            }
+            
+            // Update display elements
+            document.getElementById('student-name-display').textContent = fullName;
+            document.getElementById('score-display').textContent = `${score}%`;
+            document.getElementById('grade-display').textContent = grade;
+            document.getElementById('seat-display').textContent = seatNumber;
+            document.getElementById('query-date').textContent = new Date().toLocaleDateString('ar-EG');
+            
+            // Show result
+            document.getElementById('search-form').classList.add('hidden');
+            document.getElementById('result-display').classList.remove('hidden');
+            
+            // Scroll to result
+            document.getElementById('result-display').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }
+
+        function showError(message) {
+            document.getElementById('error-text').textContent = message;
+            document.getElementById('error-message').classList.remove('hidden');
+            
+            // Scroll to error
+            document.getElementById('error-message').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }
+
+        function resetForm() {
+            document.getElementById('result-display').classList.add('hidden');
+            document.getElementById('search-form').classList.remove('hidden');
+            document.getElementById('result-form').reset();
+            document.getElementById('error-message').classList.add('hidden');
+            
+            // Scroll to form
+            document.getElementById('search-form').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }
+
+        // Input validation for seat number
+        document.getElementById('seat-number').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // Arabic name validation (basic)
+        const nameInputs = ['first-name', 'father-name', 'grandfather-name', 'family-name'];
+        nameInputs.forEach(inputId => {
+            document.getElementById(inputId).addEventListener('input', function(e) {
+                // Allow Arabic characters, spaces, and common diacritics
+                this.value = this.value.replace(/[^\u0600-\u06FF\u0750-\u077F\s]/g, '');
+            });
+        });
+    </script>
+</body>
+</html>

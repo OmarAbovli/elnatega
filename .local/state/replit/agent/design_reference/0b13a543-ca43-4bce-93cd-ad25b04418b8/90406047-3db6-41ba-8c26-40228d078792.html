@@ -1,0 +1,484 @@
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نتيجة الثانوية العامة بمصر</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'arabic': ['Noto Sans Arabic', 'sans-serif']
+                    },
+                    colors: {
+                        'egyptian-blue': '#1e40af',
+                        'egyptian-green': '#16a34a',
+                        'egyptian-red': '#dc2626'
+                    }
+                }
+            }
+        };
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Noto Sans Arabic', sans-serif;
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1e40af;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Ad Space - Top Banner -->
+    <div class="w-full bg-gray-100 border-b border-gray-200 p-4 text-center">
+        <div class="max-w-4xl mx-auto">
+            <p class="text-sm text-gray-500 mb-2">مساحة إعلانية</p>
+            <div class="bg-white border-2 border-dashed border-gray-300 h-24 flex items-center justify-center">
+                <span class="text-gray-400 text-sm"><!-- Google AdSense Code Here (728x90) --></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <div class="flex items-center justify-center mb-4">
+                    <div class="w-16 h-16 bg-egyptian-blue rounded-full flex items-center justify-center ml-4">
+                        <span class="text-white text-2xl font-bold">🎓</span>
+                    </div>
+                    <div>
+                        <h1 id="pageTitle" class="text-3xl font-bold text-egyptian-blue mb-2">
+                            نتيجة الثانوية العامة بمصر لعام 2025
+                        </h1>
+                        <p class="text-gray-600">وزارة التربية والتعليم والتعليم الفني</p>
+                    </div>
+                </div>
+                <p id="currentDate" class="text-lg text-egyptian-green font-medium">
+                    نتيجة الثانوية العامة الجديدة بتاريخ: الأحد 15 ديسمبر 2024
+                </p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Form Section -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-6 text-center">
+                        🔍 استعلام عن النتيجة
+                    </h2>
+                    
+                    <form id="examForm" class="space-y-6">
+                        <!-- Full Name Input -->
+                        <div>
+                            <label for="fullName" class="block text-lg font-medium text-gray-700 mb-2">
+                                الاسم الرباعي <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="fullName" 
+                                name="fullName"
+                                required
+                                placeholder="اكتب الاسم الرباعي كاملاً"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-egyptian-blue focus:border-transparent text-lg"
+                                dir="rtl"
+                            >
+                            <p class="text-sm text-gray-500 mt-1">مثال: أحمد محمد علي حسن</p>
+                        </div>
+
+                        <!-- Seat Number Input -->
+                        <div>
+                            <label for="seatNumber" class="block text-lg font-medium text-gray-700 mb-2">
+                                رقم الجلوس <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="seatNumber" 
+                                name="seatNumber"
+                                required
+                                placeholder="مثال: 123456"
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-egyptian-blue focus:border-transparent text-lg"
+                                dir="ltr"
+                                pattern="[0-9]+"
+                            >
+                            <p class="text-sm text-gray-500 mt-1">أدخل رقم الجلوس المكون من أرقام فقط</p>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button 
+                            type="submit" 
+                            id="submitBtn"
+                            class="w-full bg-egyptian-blue hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition duration-300 text-lg flex items-center justify-center"
+                        >
+                            <span id="submitText">🔎 استعلام عن النتيجة</span>
+                            <div id="loadingSpinner" class="loading-spinner mr-3 hidden"></div>
+                        </button>
+                    </form>
+
+                    <!-- Error Message -->
+                    <div id="errorMessage" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <p class="text-red-600 text-center font-medium"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Ad Space - Sidebar -->
+                <div class="bg-white rounded-lg shadow-md p-4">
+                    <p class="text-sm text-gray-500 mb-2 text-center">مساحة إعلانية</p>
+                    <div class="bg-gray-100 border-2 border-dashed border-gray-300 h-64 flex items-center justify-center">
+                        <span class="text-gray-400 text-sm text-center">
+                            <!-- Google AdSense Code Here<br>(300x250) -->
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Instructions -->
+                <div class="bg-blue-50 rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-egyptian-blue mb-4">📋 تعليمات الاستعلام</h3>
+                    <ul class="space-y-2 text-sm text-gray-700">
+                        <li class="flex items-start">
+                            <span class="text-egyptian-green ml-2">•</span>
+                            اكتب الاسم الرباعي كاملاً كما هو مسجل
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-egyptian-green ml-2">•</span>
+                            أدخل رقم الجلوس بدقة
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-egyptian-green ml-2">•</span>
+                            تأكد من صحة البيانات قبل الاستعلام
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-egyptian-green ml-2">•</span>
+                            النتيجة متاحة على مدار الساعة
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Grade Scale -->
+                <div class="bg-green-50 rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-semibold text-egyptian-green mb-4">📊 مقياس التقديرات</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between items-center p-2 bg-white rounded">
+                            <span class="font-medium">ممتاز</span>
+                            <span class="text-green-600">85% - 95%</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 bg-white rounded">
+                            <span class="font-medium">جيد جداً</span>
+                            <span class="text-blue-600">75% - 85%</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 bg-white rounded">
+                            <span class="font-medium">جيد</span>
+                            <span class="text-yellow-600">60% - 75%</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 bg-white rounded">
+                            <span class="font-medium">مقبول</span>
+                            <span class="text-orange-600">50% - 60%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="resultsSection" class="hidden mt-8">
+            <div class="bg-white rounded-lg shadow-lg p-8 fade-in">
+                <div class="text-center">
+                    <div class="w-20 h-20 bg-egyptian-green rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-white text-3xl">🎉</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">نتيجة الطالب</h2>
+                    
+                    <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-right">
+                            <div>
+                                <p class="text-gray-600 mb-1">الاسم:</p>
+                                <p id="resultName" class="font-semibold text-lg">أحمد محمد علي حسن</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-600 mb-1">رقم الجلوس:</p>
+                                <p id="resultSeatNumber" class="font-semibold text-lg">123456</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mb-6">
+                        <p class="text-xl text-gray-700 mb-2">درجتك هي:</p>
+                        <p id="resultScore" class="text-5xl font-bold text-egyptian-blue mb-4">87.45%</p>
+                        <div id="resultGrade" class="inline-block px-6 py-3 bg-egyptian-green text-white rounded-lg text-xl font-semibold">
+                            ممتاز
+                        </div>
+                    </div>
+                    
+                    <div class="border-t pt-6">
+                        <p class="text-gray-600 text-sm">تاريخ الاستعلام: <span id="queryDate"></span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad Space - Bottom Banner -->
+    <div class="w-full bg-gray-100 border-t border-gray-200 p-4 text-center mt-8">
+        <div class="max-w-4xl mx-auto">
+            <p class="text-sm text-gray-500 mb-2">مساحة إعلانية</p>
+            <div class="bg-white border-2 border-dashed border-gray-300 h-24 flex items-center justify-center">
+                <span class="text-gray-400 text-sm"><!-- Google AdSense Code Here (728x90) --></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-egyptian-blue text-white text-center py-6 mt-8">
+        <p class="mb-2">© 2024 وزارة التربية والتعليم والتعليم الفني - جمهورية مصر العربية</p>
+        <p class="text-sm opacity-75">جميع الحقوق محفوظة</p>
+    </footer>
+
+    <script>
+        (function() {
+            // Initialize Supabase client
+            const SUPABASE_URL = 'https://your-project-id.supabase.co'; // TODO: Replace with actual Supabase URL
+            const SUPABASE_ANON_KEY = 'sbp_7c41e8dbc23169c2762b100643110a526562e74b';
+            
+            // TODO: Initialize Supabase client when implementing backend
+            // const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            // Set dynamic title with current year
+            function updateTitle() {
+                const currentYear = new Date().getFullYear();
+                const title = `نتيجة الثانوية العامة بمصر لعام ${currentYear}`;
+                document.getElementById('pageTitle').textContent = title;
+                document.title = title;
+            }
+
+            // Set current date in Arabic
+            function updateCurrentDate() {
+                const now = new Date();
+                const arabicDays = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+                const arabicMonths = [
+                    'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو',
+                    'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'
+                ];
+                
+                const dayName = arabicDays[now.getDay()];
+                const day = now.getDate();
+                const month = arabicMonths[now.getMonth()];
+                const year = now.getFullYear();
+                
+                const arabicDate = `${dayName} ${day} ${month} ${year}`;
+                document.getElementById('currentDate').textContent = `نتيجة الثانوية العامة الجديدة بتاريخ: ${arabicDate}`;
+            }
+
+            // Generate random score between 50.00 and 95.00
+            function generateRandomScore() {
+                return (Math.random() * (95 - 50) + 50).toFixed(2);
+            }
+
+            // Get grade based on score
+            function getGrade(score) {
+                const numScore = parseFloat(score);
+                if (numScore < 60) return 'مقبول';
+                if (numScore < 75) return 'جيد';
+                if (numScore < 85) return 'جيد جداً';
+                return 'ممتاز';
+            }
+
+            // Get grade color
+            function getGradeColor(grade) {
+                switch (grade) {
+                    case 'ممتاز': return 'bg-green-500';
+                    case 'جيد جداً': return 'bg-blue-500';
+                    case 'جيد': return 'bg-yellow-500';
+                    case 'مقبول': return 'bg-orange-500';
+                    default: return 'bg-gray-500';
+                }
+            }
+
+            // Show loading state
+            function showLoading() {
+                const submitBtn = document.getElementById('submitBtn');
+                const submitText = document.getElementById('submitText');
+                const loadingSpinner = document.getElementById('loadingSpinner');
+                
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
+                submitText.textContent = 'جاري البحث...';
+                loadingSpinner.classList.remove('hidden');
+            }
+
+            // Hide loading state
+            function hideLoading() {
+                const submitBtn = document.getElementById('submitBtn');
+                const submitText = document.getElementById('submitText');
+                const loadingSpinner = document.getElementById('loadingSpinner');
+                
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+                submitText.textContent = '🔎 استعلام عن النتيجة';
+                loadingSpinner.classList.add('hidden');
+            }
+
+            // Show error message
+            function showError(message) {
+                const errorDiv = document.getElementById('errorMessage');
+                const errorP = errorDiv.querySelector('p');
+                errorP.textContent = message;
+                errorDiv.classList.remove('hidden');
+                
+                setTimeout(() => {
+                    errorDiv.classList.add('hidden');
+                }, 5000);
+            }
+
+            // Display results
+            function displayResults(name, seatNumber, score) {
+                const grade = getGrade(score);
+                const gradeColor = getGradeColor(grade);
+                
+                document.getElementById('resultName').textContent = name;
+                document.getElementById('resultSeatNumber').textContent = seatNumber;
+                document.getElementById('resultScore').textContent = `${score}%`;
+                
+                const gradeElement = document.getElementById('resultGrade');
+                gradeElement.textContent = grade;
+                gradeElement.className = `inline-block px-6 py-3 text-white rounded-lg text-xl font-semibold ${gradeColor}`;
+                
+                // Set query date
+                const now = new Date();
+                const queryDate = now.toLocaleDateString('ar-EG');
+                document.getElementById('queryDate').textContent = queryDate;
+                
+                // Show results section
+                document.getElementById('resultsSection').classList.remove('hidden');
+                
+                // Scroll to results
+                document.getElementById('resultsSection').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+
+            // Handle form submission
+            async function handleFormSubmit(event) {
+                event.preventDefault();
+                
+                const fullName = document.getElementById('fullName').value.trim();
+                const seatNumber = document.getElementById('seatNumber').value.trim();
+                
+                // Validation
+                if (!fullName || !seatNumber) {
+                    showError('يرجى ملء جميع البيانات المطلوبة');
+                    return;
+                }
+
+                if (!/^\d+$/.test(seatNumber)) {
+                    showError('رقم الجلوس يجب أن يحتوي على أرقام فقط');
+                    return;
+                }
+
+                showLoading();
+                
+                try {
+                    // TODO: Implement database lookup logic here
+                    // For now, simulate database operation with timeout
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                    // TODO: Check if record exists in database
+                    // If exists, return stored score
+                    // If not, generate new score and store in database
+                    
+                    // For mockup purposes, generate random score
+                    const score = generateRandomScore();
+                    
+                    hideLoading();
+                    displayResults(fullName, seatNumber, score);
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    hideLoading();
+                    showError('حدث خطأ أثناء البحث. يرجى المحاولة مرة أخرى.');
+                }
+            }
+
+            // Initialize page
+            function initializePage() {
+                updateTitle();
+                updateCurrentDate();
+                
+                // Add form event listener
+                document.getElementById('examForm').addEventListener('submit', handleFormSubmit);
+                
+                // Hide results section initially
+                document.getElementById('resultsSection').classList.add('hidden');
+                document.getElementById('errorMessage').classList.add('hidden');
+            }
+
+            // Initialize when DOM is loaded
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initializePage);
+            } else {
+                initializePage();
+            }
+
+            // TODO: Implement Supabase database operations
+            /*
+            async function checkExistingResult(fullName, seatNumber) {
+                const { data, error } = await supabase
+                    .from('exam_results')
+                    .select('*')
+                    .or(`full_name.eq.${fullName},seat_number.eq.${seatNumber}`)
+                    .limit(1);
+                
+                if (error) throw error;
+                return data.length > 0 ? data[0] : null;
+            }
+
+            async function saveResult(fullName, seatNumber, score) {
+                const { data, error } = await supabase
+                    .from('exam_results')
+                    .insert([{
+                        full_name: fullName,
+                        seat_number: seatNumber,
+                        score: score,
+                        created_at: new Date().toISOString()
+                    }]);
+                
+                if (error) throw error;
+                return data;
+            }
+            */
+
+        })();
+    </script>
+</body>
+</html>
