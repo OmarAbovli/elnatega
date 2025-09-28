@@ -29,8 +29,8 @@
 
 1. **تنزيل المشروع**
    ```bash
-   git clone <your-repo-url>
-   cd egyptian-exam-results
+   git clone <https://github.com/OmarAbovli/elnatega.git>
+   cd elnatega
    ```
 
 2. **تثبيت الحزم**
